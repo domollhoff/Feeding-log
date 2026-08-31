@@ -48,16 +48,39 @@
 <script>
 (function () {
   if (!("serviceWorker" in navigator)) return;
+
   var hadController = !!navigator.serviceWorker.controller;
   var reloaded = false;
+
   navigator.serviceWorker.addEventListener("controllerchange", function () {
     if (!hadController || reloaded) return;
     reloaded = true;
     location.reload();
   });
+
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register("./sw.js").catch(function () {});
+    navigator.serviceWorker.register("./sw.js").then(function (reg) {
+      reg.update();
+      /* A waiting worker means a newer build is sitting there. Take it now
+         rather than making the user launch twice. */
+      if (reg.waiting) reg.waiting.postMessage("skip-waiting");
+      reg.addEventListener("updatefound", function () {
+        var sw = reg.installing;
+        if (!sw) return;
+        sw.addEventListener("statechange", function () {
+          if (sw.state === "installed" && navigator.serviceWorker.controller) {
+            sw.postMessage("skip-waiting");
+          }
+        });
+      });
+
+      /* Check again whenever the app comes back to the foreground. */
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) reg.update();
+      });
+    }).catch(function () {});
   });
+
   if (navigator.storage && navigator.storage.persist) {
     navigator.storage.persist().catch(function () {});
   }
