@@ -8,7 +8,7 @@
    the current version whenever there is a connection and the cached copy
    the instant there isn't. */
 
-const CACHE = "feeding-log-v2";
+const CACHE = "feeding-log-v3";
 const SHELL = ["./", "./index.html"];
 const NET_TIMEOUT = 2500;
 
@@ -34,6 +34,10 @@ self.addEventListener("activate", (event) => {
 /* Lets the page ask for an immediate handover instead of waiting a launch. */
 self.addEventListener("message", (event) => {
   if (event.data === "skip-waiting") self.skipWaiting();
+  /* Lets the profile screen report which worker is actually serving. */
+  if (event.data === "version" && event.ports && event.ports[0]) {
+    event.ports[0].postMessage(CACHE);
+  }
 });
 
 self.addEventListener("fetch", (event) => {
