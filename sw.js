@@ -8,15 +8,21 @@
    the current version whenever there is a connection and the cached copy
    the instant there isn't. */
 
-const CACHE = "feeding-log-v3";
-const SHELL = ["./", "./index.html"];
+const CACHE = "feeding-log-v4";
+const SHELL = ["./", "./index.html", "./sync-fb.js"];
 const NET_TIMEOUT = 2500;
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE)
-      .then((cache) => cache.addAll(SHELL.map((u) => new Request(u, { cache: "reload" }))))
+      .then((cache) =>
+        Promise.allSettled(
+          SHELL.map((u) =>
+            fetch(new Request(u, { cache: "reload" })).then((r) => (r.ok ? cache.put(u, r) : null))
+          )
+        )
+      )
       .then(() => self.skipWaiting())
       .catch(() => self.skipWaiting())
   );
