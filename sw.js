@@ -8,7 +8,7 @@
    the current version whenever there is a connection and the cached copy
    the instant there isn't. */
 
-const CACHE = "feeding-log-v4";
+const CACHE = "feeding-log-v5";
 const SHELL = ["./", "./index.html", "./sync-fb.js"];
 const NET_TIMEOUT = 2500;
 
