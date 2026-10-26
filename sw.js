@@ -8,8 +8,8 @@
    the current version whenever there is a connection and the cached copy
    the instant there isn't. */
 
-const CACHE = "feeding-log-v6";
-const SHELL = ["./", "./index.html", "./sync-fb.js"];
+const CACHE = "feeding-log-v8";
+const SHELL = ["./", "./index.html", "./sync-cf.js"];
 const NET_TIMEOUT = 2500;
 
 self.addEventListener("install", (event) => {
